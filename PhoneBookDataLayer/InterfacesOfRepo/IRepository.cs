@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 
 namespace PhoneBookDataLayer.InterfacesOfRepo
 {
@@ -12,7 +8,7 @@ namespace PhoneBookDataLayer.InterfacesOfRepo
         int Update(T entity);
         int Delete(T entity);
         T GetById(Id id);
-        IQueryable<T> GetAll();
-        T GetByConditions();
+        IQueryable<T> GetAll(Expression<Func<T,bool>>? filter = null, string[]? includeRelationalTables = null);
+        T GetByConditions(Expression<Func<T, bool>>? filter = null, string[]? includeRelationalTables = null);
     }
 }
