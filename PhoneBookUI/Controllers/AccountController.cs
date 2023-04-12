@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PhoneBookBusinessLayer.EmailSenderBusiness;
@@ -160,8 +161,8 @@ namespace PhoneBookUI.Controllers
             }
         }
 
-        //buraya bir kod yazılacak.
-       public IActionResult Logout()
+        [Authorize]
+        public IActionResult Logout()
         {
             HttpContext.SignOutAsync();
             return RedirectToAction("Login","Account");
@@ -184,9 +185,5 @@ namespace PhoneBookUI.Controllers
 
             return hashToCompare.SequenceEqual(Convert.FromHexString(hash));
         }
-
-
-
-
     }
 }

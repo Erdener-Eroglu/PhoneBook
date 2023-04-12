@@ -34,6 +34,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IMemberRepository, MemberRepository>();
 builder.Services.AddScoped<IMemberManager, MemberManager>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
+builder.Services.AddScoped<IPhoneTypeRepository, PhoneTypeRepository>();
+builder.Services.AddScoped<IPhoneTypeManager, PhoneTypeManager>();
+builder.Services.AddScoped<IMemberPhoneRepository, MemberPhoneRepository>();
+builder.Services.AddScoped<IMemberPhoneManager, MemberPhoneManager>();
 
 
 
@@ -50,7 +54,6 @@ app.UseRouting();
 
 app.UseAuthentication(); //Login Logout için
 app.UseAuthorization();
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
