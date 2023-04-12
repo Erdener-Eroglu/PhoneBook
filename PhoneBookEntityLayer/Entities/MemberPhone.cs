@@ -16,8 +16,9 @@ namespace PhoneBookEntityLayer.Entities
         [StringLength(13, MinimumLength = 13)] //+905302794998
         public string Phone { get; set; }
 
-        public string MemberId { get; set; } //ForeignKey
-
+        public string MemberId { get; set; } 
+        
+        //ForeignKey
         [ForeignKey("PhoneTypeId")]
         public virtual PhoneType PhoneType { get; set; }
 
