@@ -4,25 +4,26 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3>Hoşgeldiniz...Sisteme Giriş Yapabilirsiniz </h3>
+<h3>Hoşgeldiniz... Sisteme Giriş Yapabilirsiniz </h3>
 
 <div class="col-md-6 offset-3">
     @if (TempData["RegisterSuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill" /></svg>
+            @*<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill" /></svg>*@
             @TempData["RegisterSuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-
-        <div class="alert alert-success d-flex align-items-center" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill" /></svg>
-            <div>
-                An example success alert with an icon
-            </div>
-        </div>
     }
 
+    @if (ViewBag.LoginErrorMsg != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @*<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill" /></svg>*@
+            @ViewBag.LoginErrorMsg
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     <form asp-controller="Account" asp-action="Login" method="post">
 

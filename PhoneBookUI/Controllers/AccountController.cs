@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using PhoneBookBusinessLayer.EmailSenderBusiness;
 using PhoneBookBusinessLayer.InterfacesOfManagers;
 using PhoneBookEntityLayer.ViewModels;
 using PhoneBookUI.Models;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -118,7 +122,50 @@ namespace PhoneBookUI.Controllers
             return View(new LoginViewModel());
         }
 
+        [HttpPost]
+        public IActionResult Login(LoginViewModel model)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    ViewBag.LoginErrorMsg = "Gerekli alanları doldurunuz!";
+                    return View(model);
+                }
+                var user = _memberManager.GetById(model.Email).Data;
+                if(user == null)
+                {
+                    ViewBag.LoginErrorMsg = "Emailiniz ya da şifrenizi doğru yazdığınızdan emin olunuz.";
+                    return View(model);
+                }
+                var passworCompare = VerifyPassword(model.Password, user.PasswordHash, user.Salt);
+                if (!passworCompare)
+                {
+                    ViewBag.LoginErrorMsg = "Emailiniz ya da şifrenizi doğru yazdığınızdan emin olunuz.";
+                    return View(model);
+                }
+                //Grişi yapılacak
+                //Bu kişinin blgileri (email) oturum(session) cokkie olarak kayıt edeceğiz
+                var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
+                identity.AddClaim(new(ClaimTypes.Name, user.Email));
+                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(identity));
+                //Ardından home index sayfasına yönledireceğiz.
+                return RedirectToAction("Index","Home");
+            }
+            catch (Exception ex)
+            {
 
+                ViewBag.LoginErrorMsg = "Beklenmedik bir hata oluştu!. " + ex.Message;
+                return View(model);
+            }
+        }
+
+        //buraya bir kod yazılacak.
+       public IActionResult Logout()
+        {
+            HttpContext.SignOutAsync();
+            return RedirectToAction("Login","Account");
+        }
 
         private string HashPasword(string password, out byte[] salt)
         {

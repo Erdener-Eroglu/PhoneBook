@@ -1,4 +1,5 @@
 using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using PhoneBookBusinessLayer.EmailSenderBusiness;
 using PhoneBookBusinessLayer.ImplementationOfManagers;
@@ -15,6 +16,10 @@ builder.Services.AddDbContext<MyContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("Local"));
 });
+
+//CookieAuthentication ayarý
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+
 
 builder.Services.AddAutoMapper(x =>
 {
@@ -43,6 +48,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication(); //Login Logout için
 app.UseAuthorization();
 
 app.MapControllerRoute(
