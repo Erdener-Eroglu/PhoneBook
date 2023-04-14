@@ -49,7 +49,13 @@ namespace PhoneBookUI.Controllers
         {
             try
             {
-                ViewBag.PhoneTypes = _phoneTypeManager.GetAll().Data; //NOT: isRemoved viewmodelin içine eklensin.
+                var phoneTypes = _phoneTypeManager.GetAll().Data;
+                ViewBag.PhoneTypes = phoneTypes; //NOT: isRemoved viewmodelin içine eklensin.
+                ViewBag.FirstPhoneTypeId = -1;
+                if (phoneTypes.Count > 0)
+                {
+                    ViewBag.FirstPhoneTypeId = phoneTypes.FirstOrDefault()?.Id;
+                }
                 MemberPhoneViewModel model = new MemberPhoneViewModel()
                 {
                     MemberId = HttpContext.User.Identity?.Name
@@ -71,6 +77,7 @@ namespace PhoneBookUI.Controllers
             try
             {
                 ViewBag.PhoneTypes = _phoneTypeManager.GetAll().Data;
+
                 if (!ModelState.IsValid)
                 {
                     //Hata mesajı yazmadık
@@ -84,6 +91,28 @@ namespace PhoneBookUI.Controllers
                     ModelState.AddModelError("", $"Bu telefon {samePhone.PhoneType.Name} türünde zaten eklenmiştir.");
                     return View(model);
                 }
+
+                if(model.AnotherPhoneTypeName != null)
+                {
+                    
+                    //Diğeri seçip veri tabanında zatten mevcut olan türü yazarsa
+                    var samePhoneType = _phoneTypeManager.GetByConditions(x=> x.Name.ToLower() == model.AnotherPhoneTypeName.ToLower()).Data;
+                    if(samePhoneType != null)
+                    {
+                        ModelState.AddModelError("", $"{samePhoneType.Name} zaten mevcut!");
+                        return View(model);
+                    }
+
+                    //Diğer ile yazdığı türü ekledik ve idsini sldık
+                    PhoneTypeViewModel phoneType = new PhoneTypeViewModel()
+                    {
+                        CreatedDate = DateTime.Now,
+                        Name = model.AnotherPhoneTypeName
+                    };
+                    var result = _phoneTypeManager.Add(phoneType).Data;
+                    model.PhoneTypeId = result.Id;
+                }
+
                 //2) Telefonu ekle
                 //Diğer seçeneğinin senaryosunu yarın yazacağız.
                 model.CreatedDate = DateTime.Now;
@@ -202,7 +231,7 @@ namespace PhoneBookUI.Controllers
                 phone.Phone = model.Phone;
                 phone.FriendNameSurname = model.FriendNameSurname;
                 _memberPhoneManager.Update(phone);
-                return RedirectToAction("Index","Home");
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {

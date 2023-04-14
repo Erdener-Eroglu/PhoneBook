@@ -28,5 +28,6 @@ namespace PhoneBookEntityLayer.ViewModels
         public PhoneType? PhoneType { get; set; }
 
         public  Member? Member { get; set; }
+        public string? AnotherPhoneTypeName { get; set; }
     }
 }
