@@ -84,7 +84,7 @@ namespace PhoneBookUI.Controllers
                     return View();
                 }
                 //1) Aynı telefondan var mı
-                var samePhone = _memberPhoneManager.GetByConditions(x =>
+                var samePhone = _memberPhoneManager.GetByConditions(x => 
                 x.MemberId == model.MemberId && x.Phone == model.Phone).Data;
                 if (samePhone != null)
                 {
@@ -92,12 +92,12 @@ namespace PhoneBookUI.Controllers
                     return View(model);
                 }
 
-                if(model.AnotherPhoneTypeName != null)
+                if (model.AnotherPhoneTypeName != null)
                 {
-                    
+
                     //Diğeri seçip veri tabanında zatten mevcut olan türü yazarsa
-                    var samePhoneType = _phoneTypeManager.GetByConditions(x=> x.Name.ToLower() == model.AnotherPhoneTypeName.ToLower()).Data;
-                    if(samePhoneType != null)
+                    var samePhoneType = _phoneTypeManager.GetByConditions(x => x.Name.ToLower() == model.AnotherPhoneTypeName.ToLower()).Data;
+                    if (samePhoneType != null)
                     {
                         ModelState.AddModelError("", $"{samePhoneType.Name} zaten mevcut!");
                         return View(model);
@@ -209,8 +209,18 @@ namespace PhoneBookUI.Controllers
         {
             try
             {
-                //zaman azaldığı için buraya if yazıp id kontrol edilmedi
+                ViewBag.PhoneTypes = _phoneTypeManager.GetAll().Data;
+                if (id <= 0)
+                {
+                    ModelState.AddModelError("", "ID değeri sıfırdan büyük olmak sorunda");
+                    return View();
+                }
                 var phone = _memberPhoneManager.GetById(id).Data;
+                if (phone == null)
+                {
+                    ModelState.AddModelError("", "Kayıt bulunamadı");
+                    return View();
+                }
                 return View(phone);
             }
             catch (Exception ex)
@@ -226,12 +236,34 @@ namespace PhoneBookUI.Controllers
         {
             try
             {
-                //zaman azaldığı için buraya if yazıp id kontrol edilmedi
+                ViewBag.PhoneTypes = _phoneTypeManager.GetAll().Data;
+
                 var phone = _memberPhoneManager.GetById(model.Id).Data;
+                if(phone == null)
+                {
+                    ModelState.AddModelError("", "Kayıt bulunamadı");
+                    return View(model);
+                }
+                //Var olan bir telefonu mu yazmış?
+                var samePhone = _memberPhoneManager.GetByConditions(x => x.Id != model.Id && x.MemberId == HttpContext.User.Identity.Name && x.Phone == model.Phone).Data;
+
+                if(samePhone != null)
+                {
+                    ModelState.AddModelError("", $"{model.Phone}, {samePhone.FriendNameSurname} isimli kişiye aittir! Lütfen numarayı kontrol ediniz!");
+                    return View(model);
+                }
                 phone.Phone = model.Phone;
                 phone.FriendNameSurname = model.FriendNameSurname;
-                _memberPhoneManager.Update(phone);
-                return RedirectToAction("Index", "Home");
+                phone.PhoneTypeId = model.PhoneTypeId;
+                if(_memberPhoneManager.Update(phone).IsSuccess)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Güncelleme başarısız.");
+                    return View(model);
+                }
             }
             catch (Exception ex)
             {
