@@ -29,4 +29,8 @@
     <ProjectReference Include="..\PhoneBookEntityLayer\PhoneBookEntityLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Admin\Data\" />
+  </ItemGroup>
+
 </Project>

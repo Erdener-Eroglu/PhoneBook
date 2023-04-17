@@ -57,6 +57,10 @@ app.UseRouting();
 app.UseAuthentication(); //Login Logout için
 app.UseAuthorization();
 app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Home}/{action=Dashboard}/{id?}"
+    ); //area route default pattern
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
