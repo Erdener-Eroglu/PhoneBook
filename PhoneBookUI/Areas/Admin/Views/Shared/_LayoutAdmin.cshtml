@@ -38,7 +38,7 @@
                      style="opacity: .8">
                 <span class="brand-text font-weight-light">Admin Paneli</span>
             </a>
-          @await Component.InvokeAsync("AdminLeftMenu")
+            @await Component.InvokeAsync("AdminLeftMenu")
         </aside>
 
         <!-- Content Wrapper. Contains page content -->
@@ -46,9 +46,7 @@
             <!-- Content Header (Page header) -->
             <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row">
-                        @RenderBody()
-                    </div>
+                    @RenderBody()
                 </div><!-- /.container-fluid -->
             </div>
             <!-- /.content-header -->
@@ -84,5 +82,6 @@
 
     <!-- PAGE SCRIPTS -->
     <script src="~/AdminLTE/dist/js/pages/dashboard2.js"></script>
+    @await RenderSectionAsync("Scripts",required:false)
 </body>
 </html>
