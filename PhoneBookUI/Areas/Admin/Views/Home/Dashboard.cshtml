@@ -87,24 +87,43 @@
     </div>
 </div>
 
-@section Scripts
-    {
+@section Scripts{
     <script>
-        $(function () {
-            //-------------
-            //- PIE CHART -
-            //-------------
-            // Get context with jQuery - using jQuery's .get() method.
+        var typeNames = [];
+        var points = [];
+        $(document).ready(function(){
+            $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                type: 'get',
+                url: '/admin/GetPhoneTypePieData',
+                datatype: 'json',
+                success: function (response) {
+                    // bize geri dönen json objenin içindekileri javascript dizi değişkenlerine atadık. Böylece aşağıda o değişkenleri kullanabiliriz.
+                    typeNames = response.types;
+                    points = response.points;
+                    //metot çağıracağız
+                    GetPieChart();
+                },
+                error: function (response) {
+                    alert(response.message)
+                }
+            });// ajax bitti
+        });
 
+        function GetPieChart() {
             var data = {
-                labels: '',
+                labels: typeNames,
                 datasets: [
                     {
-                        data: 0,
+                        data: points,
                         backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de'],
                     }
                 ]
             }
+            //-------------
+            //- PIE CHART -
+            //-------------
+            // Get context with jQuery - using jQuery's .get() method.
             var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
             var pieData = data;
             var pieOptions = {
@@ -118,8 +137,7 @@
                 data: pieData,
                 options: pieOptions
             })
-        });
-
+        }; // GetPieChart fonk bitti
     </script>
 }
 <!-- /.col -->

@@ -30,7 +30,7 @@ namespace PhoneBookUI.Areas.Admin.Controllers
             ViewBag.MontlyContactCount = _memberPhoneManager.GetAll(x => x.CreatedDate > thisMonth.AddDays(-1)).Data.Count;
 
             //En son eklenen üyenin adı soyadı
-            var lastMember = _memberManager.GetAll().Data.LastOrDefault();
+            var lastMember = _memberManager.GetAll().Data.OrderBy(x=>x.CreatedDate).LastOrDefault();
             ViewBag.LastMember = $"{lastMember?.Name} {lastMember?.Surname}";
 
             //Rehbere son eklenen kişi
@@ -39,6 +39,34 @@ namespace PhoneBookUI.Areas.Admin.Controllers
 
 
             return View();
+        }
+        
+        [Route("/admin/GetPhoneTypePieData")]
+        public JsonResult GetPhoneTypePieData()
+        {
+            try
+            {
+                Dictionary<string, int> model = new Dictionary<string, int>();
+                var data = _memberPhoneManager.GetAll().Data;
+                foreach (var item in data)
+                {
+                    var count = 1;
+                    if (!model.ContainsKey(item.PhoneType.Name))
+                    {
+                        model.Add(item.PhoneType.Name, count);
+                    }
+                    else
+                    {
+                        model[item.PhoneType.Name]++;
+                    }
+                }
+                return Json(new { isSuccess = true, message = "Veriler geldi", types = model.Keys.ToArray(), points = model.Values.ToArray() });
+
+            }
+            catch (Exception ex)
+            {
+                return Json(new { isSuccess = false, message = "Veriler getirilemedi!" });
+            }
         }
     }
 }
