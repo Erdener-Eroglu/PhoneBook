@@ -39,5 +39,7 @@ namespace PhoneBookEntityLayer.Entities
 
         public string? ForgetPasswordToken { get; set; }
 
+        public string? Picture { get; set; }
+
     }
 }

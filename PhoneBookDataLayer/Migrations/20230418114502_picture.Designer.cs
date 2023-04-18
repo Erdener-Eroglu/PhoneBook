@@ -12,8 +12,8 @@ using PhoneBookDataLayer;
 namespace PhoneBookDataLayer.Migrations
 {
     [DbContext(typeof(MyContext))]
-    [Migration("20230410075419_initializeDB")]
-    partial class initializeDB
+    [Migration("20230418114502_picture")]
+    partial class picture
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,6 +53,9 @@ namespace PhoneBookDataLayer.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Picture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("Salt")

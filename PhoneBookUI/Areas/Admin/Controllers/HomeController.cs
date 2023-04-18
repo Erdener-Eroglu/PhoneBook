@@ -68,5 +68,22 @@ namespace PhoneBookUI.Areas.Admin.Controllers
                 return Json(new { isSuccess = false, message = "Veriler getirilemedi!" });
             }
         }
+
+        [HttpGet]
+        [Route("uyeler")]
+        public IActionResult MemberIndex()
+        {
+            try
+            {
+                var data = _memberManager.GetAll().Data;
+
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Beklenmedik bir hata oluştu! " + ex.Message);
+                return View();
+            }
+        }
     }
 }
