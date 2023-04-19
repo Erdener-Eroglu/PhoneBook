@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhoneBookBusinessLayer.InterfacesOfManagers;
 using PhoneBookEntityLayer.ViewModels;
-using PhoneBookUI.Areas.Admin.Models;
-using System.Runtime.InteropServices;
 
 namespace PhoneBookUI.Areas.Admin.Controllers
 {
@@ -14,12 +12,14 @@ namespace PhoneBookUI.Areas.Admin.Controllers
         private readonly IMemberManager _memberManager;
         private readonly IPhoneTypeManager _phoneTypeManager;
         private readonly IMemberPhoneManager _memberPhoneManager;
+        private readonly IWebHostEnvironment _environment;
 
-        public HomeController(IMemberManager memberManager, IPhoneTypeManager phoneTypeManager, IMemberPhoneManager memberPhoneManager)
+        public HomeController(IMemberManager memberManager, IPhoneTypeManager phoneTypeManager, IMemberPhoneManager memberPhoneManager, IWebHostEnvironment environment)
         {
             _memberManager = memberManager;
             _phoneTypeManager = phoneTypeManager;
             _memberPhoneManager = memberPhoneManager;
+            _environment = environment;
         }
 
         [Route("dsh")] //Action'un ismi çok uzun olabilir url'e action'ın isminin hepsini yazmak istemezsek action'a Route verebiliriz.
@@ -111,6 +111,73 @@ namespace PhoneBookUI.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("", "Beklenmedik bir hata oluştu" + ex.Message);
                 return View(new MemberViewModel());
+            }
+        }
+
+        [HttpPost]
+        [Route("duzenle")]
+        public IActionResult MemberEdit(MemberViewModel model)
+        {
+            try
+            {
+                var member = _memberManager.GetById(model.Email).Data;
+                if(member == null)
+                {
+                    ModelState.AddModelError("", "Kullanıcı bulunamadı!");
+                    return View(model);
+                }
+                member.Name = model.Name;
+                member.Surname = model.Surname;
+                member.BirthDate = model.BirthDate;
+                member.Gender = model.Gender;
+
+                //1) Upload pic null değilse RESİM yüklemesi yapılmalı.
+                //2) Upload pic yüklenen resim mi?
+                //3) Upload pis dosya boyutu >0 mı?
+                if (model.UploadPicture != null &&
+                    model.UploadPicture.ContentType.Contains("image") &&
+                    model.UploadPicture.Length > 0)
+                {
+                    //wwwroot klasörü içerisine  MemberPictures isimli bir klasör oluşturulup o klasörün çine resmi kaydetmeliyim.
+                    //Resmi kayedederken isimlendirmesini burada yeniden yapmalıyız.
+                    string uploadPath = Path.Combine(_environment.WebRootPath, "MemberPictures");
+                    if(!Directory.Exists(uploadPath))
+                    {
+                        Directory.CreateDirectory(uploadPath);
+                    }
+                    string memberPicturesName = model.Email.Replace("@", "-").Replace(".","-");
+
+                    string extentionName = Path.GetExtension(model.UploadPicture.Name);
+
+                    string filePath = Path.Combine(uploadPath, $"{memberPicturesName}.{extentionName}");
+                    Task task;
+                    using (Stream filestream = new FileStream(filePath,FileMode.Create))
+                    {
+                        task = model.UploadPicture.CopyToAsync(filestream);
+                    }
+
+                    if(task.IsCompletedSuccessfully)
+                    {
+                        member.Picture = $"/MemberPictures/{memberPicturesName}.{extentionName}";
+                    }
+                }
+                if (_memberManager.Update(member).IsSuccess)
+                {
+                    TempData["MemberEditSuccessMsg"] = $"{model.Name} {model.Surname} isimli üyenin bilgileri güncellenmiştir.";
+                    return RedirectToAction("MemberIndex");
+
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Güncelleme başarısız");
+                    return View(model);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Beklenmedik bir hata oluştu" + ex.Message);
+                return View(model);
             }
         }
     }

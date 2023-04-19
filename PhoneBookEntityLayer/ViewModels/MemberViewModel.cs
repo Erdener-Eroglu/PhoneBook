@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 
 namespace PhoneBookEntityLayer.ViewModels
 {
@@ -34,6 +35,8 @@ namespace PhoneBookEntityLayer.ViewModels
 
         public string? ForgetPasswordToken { get; set; }
         public string? Picture { get; set; }
+
+        public IFormFile? UploadPicture { get; set; }
 
     }
 }

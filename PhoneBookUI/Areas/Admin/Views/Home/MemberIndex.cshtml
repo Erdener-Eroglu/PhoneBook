@@ -3,6 +3,14 @@
     ViewData["Title"] = "MemberIndex";
     Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
 }
+@if (TempData["MemberEditSuccessMsg"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @*<svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill" /></svg>*@
+        @TempData["MemberEditSuccessMsg"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <h3>Sistemdeki Tüm Üyeler</h3>
 
@@ -23,7 +31,7 @@
             @foreach (var item in Model)
             {
                 <li>
-                    <img src="~/AdminLTE/dist/img/user1-128x128.jpg" alt="User Image">
+                    <img src="@item.Picture" alt="User Image">
                     <a class="users-list-name" href="/admin/duzenle?id=@item.Email" style="font-weight:bold">@item.Name @item.Surname.ToUpper()</a>
                     <span class="users-list-date" style="color:red">
                         @{
