@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhoneBookBusinessLayer.InterfacesOfManagers;
+using PhoneBookEntityLayer.ViewModels;
 using PhoneBookUI.Areas.Admin.Models;
+using System.Runtime.InteropServices;
 
 namespace PhoneBookUI.Areas.Admin.Controllers
 {
@@ -83,6 +85,32 @@ namespace PhoneBookUI.Areas.Admin.Controllers
             {
                 ModelState.AddModelError("", "Beklenmedik bir hata oluştu! " + ex.Message);
                 return View();
+            }
+        }
+
+        [HttpGet]
+        [Route("duzenle")]
+        public IActionResult MemberEdit(string id)
+        {
+            try
+            {
+                if(string.IsNullOrEmpty(id))
+                {
+                    ModelState.AddModelError("", "Id gelmediği için kullanıcı bulunamadı");
+                    return View(new MemberViewModel());
+                }
+                var member = _memberManager.GetById(id).Data;
+                if(member == null)
+                {
+                    ModelState.AddModelError("", "Kullanıcı bulunamadı");
+                    return View(new MemberViewModel());
+                }
+                return View(member);
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", "Beklenmedik bir hata oluştu" + ex.Message);
+                return View(new MemberViewModel());
             }
         }
     }

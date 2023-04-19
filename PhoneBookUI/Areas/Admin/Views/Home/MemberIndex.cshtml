@@ -24,7 +24,7 @@
             {
                 <li>
                     <img src="~/AdminLTE/dist/img/user1-128x128.jpg" alt="User Image">
-                    <a class="users-list-name" href="#" style="font-weight:bold">@item.Name @item.Surname.ToUpper()</a>
+                    <a class="users-list-name" href="/admin/duzenle?id=@item.Email" style="font-weight:bold">@item.Name @item.Surname.ToUpper()</a>
                     <span class="users-list-date" style="color:red">
                         @{
                             TimeSpan span = new TimeSpan();
