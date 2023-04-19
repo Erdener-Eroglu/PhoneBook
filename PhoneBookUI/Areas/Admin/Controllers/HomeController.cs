@@ -32,7 +32,7 @@ namespace PhoneBookUI.Areas.Admin.Controllers
             ViewBag.MontlyContactCount = _memberPhoneManager.GetAll(x => x.CreatedDate > thisMonth.AddDays(-1)).Data.Count;
 
             //En son eklenen üyenin adı soyadı
-            var lastMember = _memberManager.GetAll().Data.OrderBy(x=>x.CreatedDate).LastOrDefault();
+            var lastMember = _memberManager.GetAll().Data.OrderBy(x => x.CreatedDate).LastOrDefault();
             ViewBag.LastMember = $"{lastMember?.Name} {lastMember?.Surname}";
 
             //Rehbere son eklenen kişi
@@ -42,7 +42,7 @@ namespace PhoneBookUI.Areas.Admin.Controllers
 
             return View();
         }
-        
+
         [Route("/admin/GetPhoneTypePieData")]
         public JsonResult GetPhoneTypePieData()
         {
@@ -94,13 +94,13 @@ namespace PhoneBookUI.Areas.Admin.Controllers
         {
             try
             {
-                if(string.IsNullOrEmpty(id))
+                if (string.IsNullOrEmpty(id))
                 {
                     ModelState.AddModelError("", "Id gelmediği için kullanıcı bulunamadı");
                     return View(new MemberViewModel());
                 }
                 var member = _memberManager.GetById(id).Data;
-                if(member == null)
+                if (member == null)
                 {
                     ModelState.AddModelError("", "Kullanıcı bulunamadı");
                     return View(new MemberViewModel());
@@ -121,7 +121,7 @@ namespace PhoneBookUI.Areas.Admin.Controllers
             try
             {
                 var member = _memberManager.GetById(model.Email).Data;
-                if(member == null)
+                if (member == null)
                 {
                     ModelState.AddModelError("", "Kullanıcı bulunamadı!");
                     return View(model);
@@ -141,25 +141,24 @@ namespace PhoneBookUI.Areas.Admin.Controllers
                     //wwwroot klasörü içerisine  MemberPictures isimli bir klasör oluşturulup o klasörün çine resmi kaydetmeliyim.
                     //Resmi kayedederken isimlendirmesini burada yeniden yapmalıyız.
                     string uploadPath = Path.Combine(_environment.WebRootPath, "MemberPictures");
-                    if(!Directory.Exists(uploadPath))
+                    if (!Directory.Exists(uploadPath))
                     {
                         Directory.CreateDirectory(uploadPath);
                     }
-                    string memberPicturesName = model.Email.Replace("@", "-").Replace(".","-");
+                    string memberPicturesName = model.Email.Replace("@", "-").Replace(".", "-");
 
-                    string extentionName = Path.GetExtension(model.UploadPicture.Name);
+                    string extentionName = Path.GetExtension(model.UploadPicture.FileName);
 
-                    string filePath = Path.Combine(uploadPath, $"{memberPicturesName}.{extentionName}");
-                    Task task;
-                    using (Stream filestream = new FileStream(filePath,FileMode.Create))
+                    string filePath = Path.Combine(uploadPath, $"{memberPicturesName}{extentionName}");
+
+                    using (Stream filestream = new FileStream(filePath, FileMode.Create))
                     {
-                        task = model.UploadPicture.CopyToAsync(filestream);
+                        model.UploadPicture.CopyToAsync(filestream);
                     }
 
-                    if(task.IsCompletedSuccessfully)
-                    {
-                        member.Picture = $"/MemberPictures/{memberPicturesName}.{extentionName}";
-                    }
+
+                    member.Picture = $"/MemberPictures/{memberPicturesName}{extentionName}";
+
                 }
                 if (_memberManager.Update(member).IsSuccess)
                 {
